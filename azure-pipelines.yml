@@ -5,7 +5,7 @@ pool:
   name: prasadpool
 
 variables:
-#- group: terraform-secrets   # 🔐 from Library
+- group: terraform-secrets
 
 - name: TF_VERSION
   value: '1.6.6'
@@ -23,17 +23,22 @@ stages:
         sudo apt install -y unzip wget
 
         wget https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip
-
         unzip terraform_$(TF_VERSION)_linux_amd64.zip
-
         sudo mv terraform /usr/local/bin/
 
         terraform -version
       displayName: "Install Terraform"
 
-    - script: |
-        echo "Using Terraform Azure provider authentication only"
-      displayName: "Skip Azure CLI"
+    # Azure Login (via Service Connection)
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'azure-connection'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo "Azure login successful"
+          az account show
+      displayName: "Azure Login"
 
     # Terraform Init
     - script: terraform init
@@ -56,7 +61,6 @@ stages:
 
     # Terraform Apply
     - script: |
-        terraform apply \
-          -auto-approve tfplan
+        terraform apply -auto-approve tfplan
       workingDirectory: "$(System.DefaultWorkingDirectory)/azure-.2tier-terraform-python"
       displayName: "Terraform Apply"
