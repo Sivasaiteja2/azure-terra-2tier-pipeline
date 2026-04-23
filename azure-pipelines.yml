@@ -1,8 +1,8 @@
 trigger:
-- none
+- main
 
 pool:
-  name: prasadpool
+  name: myagent
 
 variables:
 - group: terraform-secrets
@@ -51,7 +51,7 @@ stages:
     # =========================
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'azure-connection'
+        azureSubscription: 'my-service'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
@@ -70,7 +70,7 @@ stages:
     # =========================
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'azure-connection'
+        azureSubscription: 'my-service'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
